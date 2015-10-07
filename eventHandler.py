@@ -15,34 +15,34 @@ class EventListener:
 	# Grabs Mouse Event Data
 	def onMouseEvent(event):
 		mouseEventData = {
-						"MessageName":event.MessageName,
-						"Message":event.Message,
-						"Time":event.Time,
-						"Window":event.Window,
-						"WindowName":event.WindowName,
-						"Position":event.Position,
-						"Wheel":event.Wheel,
-						"Injected":event.Injected
-						}
+				"MessageName":event.MessageName,
+				"Message":event.Message,
+				"Time":event.Time,
+				"Window":event.Window,
+				"WindowName":event.WindowName,
+				"Position":event.Position,
+				"Wheel":event.Wheel,
+				"Injected":event.Injected
+				}
 
 		return(eventData)
 
 	# Grabs Keyboard Event Data
 	def onKeyBoardEvent(event):
 		keybdEventData = {
-						"MessageName":event.MessageName,
-						"Message":event.Message,
-						"Time":event.Time,
-						"Window":event.Window,
-						"WindowName":event.WindowName,
-						'Ascii':chr(event.Ascii),
-						'Key':event.Key,
-						'KeyID':event.KeyID,
-						'ScanCode':event.ScanCode,
-						'Extended':event.Extended,
-						'Injected':event.Injected,
-						'Alt':event.Alt,
-						'Transition':event.Transition
-						}
+				"MessageName":event.MessageName,
+				"Message":event.Message,
+				"Time":event.Time,
+				"Window":event.Window,
+				"WindowName":event.WindowName,
+				'Ascii':chr(event.Ascii),
+				'Key':event.Key,
+				'KeyID':event.KeyID,
+				'ScanCode':event.ScanCode,
+				'Extended':event.Extended,
+				'Injected':event.Injected,
+				'Alt':event.Alt,
+				'Transition':event.Transition
+				}
 
 		return(keybdEventData)
