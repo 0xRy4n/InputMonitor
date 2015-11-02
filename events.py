@@ -1,82 +1,79 @@
-import pythoncom, pyHook, collections.OrderedDict
+import pythoncom, pyHook, datetime
+
 
 class Auditor:
 
 	def __init__(self, windowName = None):
-		applicationFilter = windowName
-
+		self.applicationFilter = windowName
 
 	def audit(self, data):
-		if applicationFilter is not None:
+		if self.applicationFilter is not None:
 			# Filter out event data that didn't take place in the window specified by windowName
-			if data["WindowName"] == applicationFilter:
-				transcribe(data)
+			if data["WindowName"] == self.applicationFilter:
+				self.transcribe(data)
 
 		else:
-			transcribe(data)
+			self.transcribe(data)
 
 	# Write data passed by Listener to data file.
-	def transcribe(data):
+	def transcribe(self, data):
 		dataFile = open("eventData.dat", 'a')
 
 		firstWrite = True
-		for key, value in data.items():	
-
+		for key, value in data.items():
 			if not firstWrite:
-				dataFile.write(">> {}|{}".format(key, value))
+				dataFile.write(">> {}|{}\n".format(key, value))
 
 			else:
-				dataFile.write(":: {}\n".format(value))
+				a = datetime.datetime.now()
+				dataFile.write(":: {}\n".format(a.now().strftime('%H:%M:%S.%f')))
 				firstWrite = False
-
 
 class Listener:
 
 	hookManager = pyHook.HookManager()
 
-	def __init__(self):
+	def __init__(self, auditor = None):
+		if auditor == None:
+			print("Critical Error: No auditor passed into Listener.")
 
-		# Specifies the functions that handle events
-		hookManager.MouseAll = _onMouseEvent
-		hookManager.KeyDown = _onKeyBoardEvent
 
-		# Hooks onto inputs
-		hookManager.HookMouse()
-		hookManager.hookKeyboard()
-
+		self.auditor = auditor	
+		self.hookManager.MouseAll = self.onMouseEvent
+		self.hookManager.KeyDown = self.onKeyBoardEvent
+		self.hookManager.HookMouse()
+		self.hookManager.HookKeyboard()
 		pythoncom.PumpMessages() # Lets program sit forever, and wait for events.
 
 
 	# Grabs Mouse Event Data
-	def _onMouseEvent(event):
-		mouseEventData = OrderedDict(("Time", event.Time),
-									("MessageName", event.MessageName),
-									("Message", event.Message),
-									("Window", event.Window),
-									("WindowName", event.WindowName),
-									("Position", event.Position),
-									("Wheel": event.Wheel),
-									("Injected":event.Injected)
-									)
+	def onMouseEvent(self, event):
+		mouseEventData = {
+				"MessageName":event.MessageName,
+				"Message":event.Message,
+				"Window":event.Window,
+				"WindowName":event.WindowName,
+				"Position":event.Position,
+				"Wheel":event.Wheel,
+				}
 
-		return(eventData)
-
+		self.auditor.audit(mouseEventData)
 
 	# Grabs Keyboard Event Data
-	def _onKeyBoardEvent(event):
-		keybdEventData = OrderedDict(("MessageName", event.MessageName),
-									("Message", event.Message),
-									("Time", event.Time),
-									("Window", event.Window)
-									('Ascii', chr(event.Ascii),
-									('Key', event.Key)
-									('KeyID', event.KeyID),
-									('ScanCode'), event.ScanCode),
-									('Extended'), event.Extended),
-									('Injected'), event.Injected),
-									('Alt', event.Alt),
-									('Transition', event.Transition)
-									)
+	def onKeyBoardEvent(self, event):
+		keybdEventData = {
+				"MessageName":event.MessageName,
+				"Message":event.Message,
+				"Time":event.Time,
+				"Window":event.Window,
+				"WindowName":event.WindowName,
+				'Ascii':chr(event.Ascii),
+				'Key':event.Key,
+				'KeyID':event.KeyID,
+				'ScanCode':event.ScanCode,
+				'Extended':event.Extended,
+				'Alt':event.Alt,
+				'Transition':event.Transition
+				}
 
-		return(keybdEventData)
-
+		self.auditor.audit(keybdEventData)
